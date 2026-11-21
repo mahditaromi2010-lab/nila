@@ -1,0 +1,12 @@
+{% extends "shop/base.html" %}
+{% block title %}{{ p.title or "شعر" }} | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap-sm">
+  <div class="read-paper">
+    {% if p.title %}<h1 style="text-align:center;margin-bottom:1.4rem">{{ p.title }}</h1>{% endif %}
+    <div class="poem-body">{{ p.body }}</div>
+    {% if p.collection %}<p class="muted" style="text-align:center;margin-top:1.4rem">از «{{ p.collection }}»</p>{% endif %}
+  </div>
+  <p style="text-align:center;margin-top:1.6rem"><a class="btn btn-ghost" href="{{ url_for('shop.poems') }}">بازگشت به شعرها</a></p>
+</section>
+{% endblock %}

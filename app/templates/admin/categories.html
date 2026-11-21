@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}دسته‌ها{% endblock %}
+{% block content %}
+<div class="topbar"><h1>دسته‌ها (شعر، رمان، داستان کوتاه...)</h1></div>
+<div class="card">
+  <table>
+    <tr><th>نام</th><th>نامک</th><th>وضعیت</th><th></th></tr>
+    {% for c in rows %}
+    <tr>
+      <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <td><input class="input" name="name" value="{{ c.name }}"></td>
+        <td><input class="input" name="slug" value="{{ c.slug }}"></td>
+        <td><label><input type="checkbox" name="is_active" value="1" {{ "checked" if c.is_active }}> فعال</label></td>
+        <td>
+          <input type="hidden" name="id" value="{{ c.id }}">
+          <button class="btn btn-sm">ذخیره</button>
+          <button class="btn btn-danger btn-sm" name="action" value="delete">حذف</button>
+        </td>
+      </form>
+    </tr>
+    {% endfor %}
+  </table>
+  <h3 style="margin-top:1.4rem">افزودن دسته‌ی تازه</h3>
+  <form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field"><label>نام</label><input class="input" name="name" required></div>
+    <div class="field"><label>نامک (اختیاری)</label><input class="input" name="slug"></div>
+    <div class="field"><label>توضیح</label><input class="input" name="description"></div>
+    <div class="field"><label>ترتیب</label><input class="input" type="number" name="sort" value="0"></div>
+    <input type="hidden" name="is_active" value="1">
+    <button class="btn" type="submit">افزودن</button>
+  </form>
+</div>
+{% endblock %}

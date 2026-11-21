@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}تنظیمات{% endblock %}
+{% block content %}
+<div class="topbar"><h1>تنظیمات</h1></div>
+<div class="toolbar">
+  <a class="btn {{ 'btn-ghost' if group != 'general' }}" href="{{ url_for('admin.settings_page', group='general') }}">عمومی</a>
+  <a class="btn {{ 'btn-ghost' if group != 'payment' }}" href="{{ url_for('admin.settings_page', group='payment') }}">پرداخت</a>
+  <a class="btn {{ 'btn-ghost' if group != 'shipping' }}" href="{{ url_for('admin.settings_page', group='shipping') }}">ارسال</a>
+</div>
+<form method="post" class="card"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if group == "payment" %}
+  <p class="help">درگاه آنلاین (زرین‌پال) {{ "آماده است" if gateway_ready else "هنوز آماده نیست — باید ZARINPAL_MERCHANT_ID و PUBLIC_BASE_URL در متغیرهای محیطی تنظیم شوند." }}
+    {% if gateway_ready %}(حالت: {{ "آزمایشی" if sandbox else "واقعی" }}){% endif %}</p>
+  {% endif %}
+  <div class="form-grid">
+    {% for key in keys %}
+    <div class="field">
+      <label>{{ key }}</label>
+      {% if key in ("about_text", "card_instructions") %}
+        <textarea class="input" name="{{ key }}">{{ s.get(key, defaults.get(key,"")) }}</textarea>
+      {% elif key in ("card_to_card_enabled", "gateway_enabled") %}
+        <label><input type="checkbox" name="{{ key }}" value="1" {{ "checked" if s.get(key)=="1" }}> فعال</label>
+      {% else %}
+        <input class="input" name="{{ key }}" value="{{ s.get(key, defaults.get(key,'')) }}">
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <button class="btn" type="submit">ذخیره</button>
+</form>
+{% endblock %}

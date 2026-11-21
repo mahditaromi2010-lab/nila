@@ -1,0 +1,67 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_components.html" import book_card %}
+{% block title %}{{ b.title }} | {{ S.site_name_fa }}{% endblock %}
+{% block description %}{{ b.short }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  <div class="checkout-grid">
+    <div>
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:2rem">
+        <div class="book-cover" style="border-radius:var(--radius);box-shadow:var(--shadow)">
+          {% if b.cover %}<img src="{{ media_url(b.cover.path) }}" alt="{{ b.title }}">
+          {% else %}{{ icon("book", "fallback") }}{% endif %}
+          {% if b.is_featured %}<span class="badge">برگزیده</span>{% endif %}
+        </div>
+        <div>
+          {% if b.category %}<span class="cat">{{ b.category.name }}</span>{% endif %}
+          <h1 style="margin-top:.4rem">{{ b.title }}</h1>
+          {% if b.subtitle %}<p class="muted">{{ b.subtitle }}</p>{% endif %}
+          <p style="margin-top:.6rem">نویسنده: <strong>{{ b.author }}</strong></p>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin:.8rem 0">
+            {% if b.pages %}<span class="tag-pill">{{ icon("book") }} {{ b.pages|fa }} صفحه</span>{% endif %}
+            <span class="tag-pill">{{ "نسخه‌ی PDF" if b.is_digital else "نسخه‌ی چاپی" }}</span>
+            {% if b.published_year %}<span class="tag-pill">{{ b.published_year|fa }}</span>{% endif %}
+          </div>
+          <div class="price-row" style="margin:1rem 0">
+            {% if b.price == 0 %}<span class="price-free" style="font-size:1.4rem">رایگان</span>
+            {% else %}
+              <span class="price" style="font-size:1.5rem">{{ b.price|money }} تومان</span>
+              {% if b.discount_percent %}<span class="price-old">{{ b.compare_price|money }}</span>{% endif %}
+            {% endif %}
+          </div>
+          {% if b.in_stock %}
+          <form method="post" action="{{ url_for('shop.cart_add') }}" style="display:flex;gap:.6rem;align-items:center"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="book_id" value="{{ b.id }}">
+            <input type="hidden" name="next" value="cart">
+            {% if not b.is_digital %}<input class="input qty-input" type="number" name="qty" value="1" min="1" max="{{ b.max_qty() }}">{% endif %}
+            <button class="btn" type="submit">{{ icon("cart") }} افزودن به سبد</button>
+          </form>
+          {% else %}
+          <p class="status-pill rejected">فعلاً موجود نیست</p>
+          {% endif %}
+          {% if b.is_free_read and b.full_text %}
+          <p style="margin-top:1rem"><a class="btn btn-ghost" href="{{ url_for('shop.book_read', slug=b.slug) }}">{{ icon("feather") }} خواندن رایگان آنلاین</a></p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if b.description %}
+      <div class="prose" style="margin-top:2.2rem;white-space:pre-line">{{ b.description }}</div>
+      {% endif %}
+
+      {% if b.excerpt %}
+      <div class="read-paper" style="margin-top:2rem">
+        <h3 style="text-align:center;margin-bottom:1rem">بخشی برای خواندن</h3>
+        <div style="white-space:pre-line">{{ b.excerpt }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if related %}
+  <div class="row-head" style="margin-top:3rem"><h2>کتاب‌های مرتبط</h2></div>
+  <div class="grid grid-4">{% for r in related %}{{ book_card(r) }}{% endfor %}</div>
+  {% endif %}
+</section>
+{% endblock %}

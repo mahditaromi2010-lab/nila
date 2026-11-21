@@ -1,0 +1,18 @@
+{% extends "shop/base.html" %}
+{% block title %}{{ b.title }} | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  <div class="read-title">
+    <p class="muted">{{ b.author }}</p>
+    <h1>{{ b.title }}</h1>
+    {% if b.subtitle %}<p class="muted">{{ b.subtitle }}</p>{% endif %}
+    <p class="muted" style="margin-top:.4rem">زمان تقریبی خواندن: {{ minutes|fa }} دقیقه</p>
+  </div>
+  <div class="read-paper">
+    {% for para in b.full_text.split('\n') %}{% if para.strip() %}<p>{{ para }}</p>{% endif %}{% endfor %}
+  </div>
+  {% if b.price > 0 %}
+  <p style="text-align:center;margin-top:2rem"><a class="btn" href="{{ url_for('shop.book', slug=b.slug) }}">نسخه‌ی کامل و خریداری‌شده را می‌خواهید؟ اینجا کلیک کنید</a></p>
+  {% endif %}
+</section>
+{% endblock %}

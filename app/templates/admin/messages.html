@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}پیام‌ها{% endblock %}
+{% block content %}
+<div class="topbar"><h1>پیام‌های تماس</h1></div>
+<div class="card">
+  <table>
+    <tr><th>نام</th><th>راه تماس</th><th>پیام</th><th>تاریخ</th><th></th></tr>
+    {% for m in rows %}
+    <tr style="{{ 'opacity:.6' if m.is_read }}">
+      <td>{{ m.name }}</td><td>{{ m.contact }}</td><td>{{ m.body[:120] }}</td><td>{{ m.created_at|jdate }}</td>
+      <td><form method="post" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="id" value="{{ m.id }}">
+        <button class="btn btn-ghost btn-sm">{{ "علامت نخوانده" if m.is_read else "علامت خوانده" }}</button>
+        <button class="btn btn-danger btn-sm" name="action" value="delete">حذف</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

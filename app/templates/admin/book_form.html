@@ -1,0 +1,83 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ b.title or "کتاب تازه" }}{% endblock %}
+{% block content %}
+<div class="topbar"><h1>{{ b.title or "کتاب تازه" }}</h1><a class="btn btn-ghost" href="{{ url_for('admin.books') }}">بازگشت</a></div>
+
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label>عنوان</label><input class="input" name="title" value="{{ b.title }}" required></div>
+      <div class="field"><label>زیرعنوان</label><input class="input" name="subtitle" value="{{ b.subtitle }}"></div>
+      <div class="field"><label>نامک (slug) — خالی بگذار تا خودکار بسازد</label><input class="input" name="slug" value="{{ b.slug }}"></div>
+      <div class="field"><label>نویسنده</label><input class="input" name="author" value="{{ b.author or 'نیلا بستان‌پیرا' }}"></div>
+      <div class="field"><label>دسته</label>
+        <select class="input" name="category_id">
+          <option value="">بدون دسته</option>
+          {% for c in categories %}<option value="{{ c.id }}" {{ "selected" if b.category_id == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select></div>
+      <div class="field"><label>نوع</label>
+        <select class="input" name="format">
+          <option value="pdf" {{ "selected" if b.format == "pdf" }}>دیجیتال (PDF)</option>
+          <option value="physical" {{ "selected" if b.format == "physical" }}>چاپی</option>
+        </select></div>
+      <div class="field"><label>قیمت (تومان، صفر = رایگان)</label><input class="input" type="number" name="price" value="{{ b.price }}"></div>
+      <div class="field"><label>قیمت قبل از تخفیف (اختیاری)</label><input class="input" type="number" name="compare_price" value="{{ b.compare_price }}"></div>
+      <div class="field"><label>موجودی (فقط برای چاپی)</label><input class="input" type="number" name="stock" value="{{ b.stock }}"></div>
+      <div class="field"><label>تعداد صفحات</label><input class="input" type="number" name="pages" value="{{ b.pages }}"></div>
+      <div class="field"><label>سال انتشار</label><input class="input" name="published_year" value="{{ b.published_year }}"></div>
+      <div class="field"><label>شابک (ISBN)</label><input class="input" name="isbn" value="{{ b.isbn }}"></div>
+      <div class="field"><label>کد انبار (SKU)</label><input class="input" name="sku" value="{{ b.sku }}"></div>
+      <div class="field"><label>برچسب‌ها (با کاما)</label><input class="input" name="tags" value="{{ b.tags }}"></div>
+      <div class="field"><label>ترتیب نمایش</label><input class="input" type="number" name="sort" value="{{ b.sort }}"></div>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" name="is_active" value="1" {{ "checked" if b.is_active }}> نمایش در سایت</label>
+      <label><input type="checkbox" name="is_featured" value="1" {{ "checked" if b.is_featured }}> برگزیده</label>
+      <label><input type="checkbox" name="is_free_read" value="1" {{ "checked" if b.is_free_read }}> خواندن آنلاین رایگان از متن کامل</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="field"><label>توضیح کوتاه (برای کارت‌ها)</label><input class="input" name="short" value="{{ b.short }}"></div>
+    <div class="field"><label>توضیح کامل (پشت جلد)</label><textarea class="input" name="description" style="min-height:140px">{{ b.description }}</textarea></div>
+    <div class="field"><label>بخشی برای خواندن قبل از خرید (اختیاری)</label><textarea class="input" name="excerpt" style="min-height:140px">{{ b.excerpt }}</textarea></div>
+    <div class="field"><label>متن کامل کتاب (برای خواندن آنلاین، اختیاری)</label><textarea class="input" name="full_text" style="min-height:220px">{{ b.full_text }}</textarea></div>
+  </div>
+
+  <div class="card">
+    <h3>جلد کتاب</h3>
+    {% if b.images %}
+    <div class="img-strip">
+      {% for img in b.images %}
+      <figure>
+        <img src="{{ media_url(img.path_sm) }}" alt="">
+        <div class="ops">
+          <button class="btn btn-ghost btn-sm" form="imgform{{ img.id }}" name="action" value="main">اصلی</button>
+          <button class="btn btn-danger btn-sm" form="imgform{{ img.id }}" name="action" value="delete">حذف</button>
+        </div>
+        <form id="imgform{{ img.id }}" method="post" action="{{ url_for('admin.book_image', bid=b.id, iid=img.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>
+      </figure>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="field" style="margin-top:1rem"><label>افزودن تصویر جلد</label><input class="input" type="file" name="images" accept="image/*" multiple></div>
+    <div class="field"><label>فایل PDF {% if b.pdf_path %}(یک فایل آپلود شده است — آپلود تازه جایگزین می‌کند){% endif %}</label>
+      <input class="input" type="file" name="pdf_file" accept="application/pdf"></div>
+  </div>
+
+  <button class="btn" type="submit">{{ icon("check") }} ذخیره</button>
+</form>
+
+{% if b.id %}
+<div class="card" style="margin-top:1.2rem">
+  <h3>حذف کتاب</h3>
+  <p class="help">برای حذف، نامک «{{ b.slug }}» را دقیق تایپ کن.</p>
+  <form method="post" action="{{ url_for('admin.book_action', bid=b.id) }}" style="display:flex;gap:.6rem"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input class="input" name="confirm" placeholder="{{ b.slug }}">
+    <button class="btn btn-danger" name="action" value="delete">حذف همیشگی</button>
+  </form>
+  {% if sold %}<p class="help">تا امروز {{ sold|fa }} نسخه از این کتاب فروخته شده است.</p>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

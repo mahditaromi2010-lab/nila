@@ -1,0 +1,36 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_components.html" import book_card, banner_block %}
+{% block title %}کتاب‌ها | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  {% for b in top_banners %}{{ banner_block(b) }}{% endfor %}
+  <div class="section-head">
+    <h1>{{ category.name if category else "کتاب‌ها" }}</h1>
+    {% if category and category.description %}<p>{{ category.description }}</p>{% endif %}
+  </div>
+
+  <div class="filters">
+    <a class="{{ 'active' if not category }}" href="{{ url_for('shop.catalog') }}">همه</a>
+    {% for c in categories %}
+      <a class="{{ 'active' if category and category.id == c.id }}" href="{{ url_for('shop.catalog', cat=c.slug) }}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+
+  {% if pager.items %}
+  <div class="grid grid-4">{% for b in pager.items %}{{ book_card(b) }}{% endfor %}</div>
+  {% if pager.pages > 1 %}
+  <div class="pagination">
+    {% for p in pager.iter_pages() %}
+      {% if p %}
+        {% if p == pager.page %}<span class="current">{{ p|fa }}</span>
+        {% else %}<a href="{{ url_for('shop.catalog', page=p, cat=category.slug if category else none, q=q, sort=sort) }}">{{ p|fa }}</a>{% endif %}
+      {% else %}<span>…</span>{% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="empty-state">{{ icon("book") }}<p>چیزی پیدا نشد.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

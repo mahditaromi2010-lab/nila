@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}بنر{% endblock %}
+{% block content %}
+<div class="topbar"><h1>{{ "بنر تازه" if not b.id else "ویرایش بنر" }}</h1><a class="btn btn-ghost" href="{{ url_for('admin.banners') }}">بازگشت</a></div>
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label>عنوان</label><input class="input" name="title" value="{{ b.title }}"></div>
+      <div class="field"><label>زیرعنوان</label><input class="input" name="subtitle" value="{{ b.subtitle }}"></div>
+      <div class="field"><label>محل نمایش</label>
+        <select class="input" name="placement">
+          {% for key, label in placements.items() %}<option value="{{ key }}" {{ "selected" if b.placement == key }}>{{ label }}</option>{% endfor %}
+        </select></div>
+      <div class="field"><label>سبک رنگی</label>
+        <select class="input" name="style">
+          <option value="ink" {{ "selected" if b.style == "ink" }}>جوهری (تیره)</option>
+          <option value="gold" {{ "selected" if b.style == "gold" }}>طلایی</option>
+          <option value="paper" {{ "selected" if b.style == "paper" }}>کاغذی (روشن)</option>
+        </select></div>
+      <div class="field"><label>لینک (اختیاری)</label><input class="input" name="link_url" value="{{ b.link_url }}"></div>
+      <div class="field"><label>متن دکمه</label><input class="input" name="link_label" value="{{ b.link_label }}"></div>
+      <div class="field"><label>ترتیب</label><input class="input" type="number" name="sort" value="{{ b.sort }}"></div>
+    </div>
+    <div class="field"><label>متن نقل‌قول / شعر کوتاه</label><textarea class="input" name="quote_text">{{ b.quote_text }}</textarea></div>
+    <div class="field"><label>تصویر پس‌زمینه (اختیاری)</label><input class="input" type="file" name="image" accept="image/*"></div>
+    {% if b.image %}<img src="{{ media_url(b.image_sm) }}" style="max-width:200px;border-radius:8px;margin-top:.5rem">{% endif %}
+    <label style="margin-top:1rem;display:inline-flex;gap:.4rem;align-items:center"><input type="checkbox" name="is_active" value="1" {{ "checked" if b.is_active }}> فعال</label>
+  </div>
+  <button class="btn" type="submit">{{ icon("check") }} ذخیره</button>
+</form>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}داشبورد{% endblock %}
+{% block content %}
+<div class="topbar"><h1>داشبورد</h1></div>
+
+{% if setup_missing %}
+<div class="card" style="border-color:var(--gold);margin-bottom:1.2rem">
+  هنوز شماره کارت ثبت نشده — بدون آن، سفارش‌های کارت‌به‌کارت امکان پرداخت ندارند.
+  <a href="{{ url_for('admin.settings_page', group='payment') }}">تنظیم‌کردن از اینجا</a>
+</div>
+{% endif %}
+
+<div class="stat-grid">
+  <div class="stat"><div class="n">{{ stats.orders_24h|fa }}</div><div class="l">سفارش ۲۴ ساعت گذشته</div></div>
+  <div class="stat"><div class="n">{{ stats.review|fa }}</div><div class="l">در انتظار بررسی پرداخت</div></div>
+  <div class="stat"><div class="n">{{ stats.to_ship|fa }}</div><div class="l">آماده‌ی ارسال</div></div>
+  <div class="stat"><div class="n">{{ stats.revenue_30d|money }}</div><div class="l">درآمد ۳۰ روز (تومان)</div></div>
+</div>
+
+<div class="card">
+  <h3>فروش ۱۴ روز گذشته</h3>
+  <div class="chart">{% for d in days %}<i style="height:{{ (d.total / peak * 86)|round|int }}px" title="{{ d.date.strftime('%m/%d') }} — {{ d.total|money }}"></i>{% endfor %}</div>
+</div>
+
+<div class="card">
+  <h3>سفارش‌های اخیر</h3>
+  <table>
+    <tr><th>کد</th><th>مشتری</th><th>وضعیت</th><th>مبلغ</th><th></th></tr>
+    {% for o in recent %}
+    <tr><td class="latin">{{ o.code }}</td><td>{{ o.customer_name }}</td><td><span class="pill">{{ o.status_label }}</span></td>
+      <td>{{ o.total|money }}</td><td><a href="{{ url_for('admin.order_detail', code=o.code) }}">مشاهده</a></td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% if low_stock %}
+<div class="card">
+  <h3>موجودی کم (کتاب چاپی)</h3>
+  <table>
+    <tr><th>کتاب</th><th>موجودی</th></tr>
+    {% for b in low_stock %}<tr><td><a href="{{ url_for('admin.book_edit', bid=b.id) }}">{{ b.title }}</a></td><td>{{ b.stock|fa }}</td></tr>{% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}

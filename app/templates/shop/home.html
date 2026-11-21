@@ -1,0 +1,70 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon, ornament %}
+{% from "_components.html" import book_card, poem_card, banner_block %}
+{% block content %}
+
+{% for b in hero_banners %}{{ banner_block(b) }}{% endfor %}
+
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <span class="hero-eyebrow">{{ icon("sparkle") }} {{ S.author_name }}</span>
+      <h1>{{ S.hero_title }}</h1>
+      <p>{{ S.hero_subtitle }}</p>
+      <div class="hero-actions">
+        <a class="btn" href="{{ url_for('shop.catalog') }}">{{ icon("book") }} دیدن کتاب‌ها</a>
+        <a class="btn btn-ghost" href="{{ url_for('shop.poems') }}">{{ icon("feather") }} خواندن شعرها</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">{{ icon("feather") }}</div>
+  </div>
+</section>
+
+{% if hero_poems %}
+<section class="section wrap-sm">
+  {% for p in hero_poems %}{{ poem_card(p) }}{% endfor %}
+</section>
+{% endif %}
+
+{% if featured %}
+<section class="section wrap">
+  <div class="row-head">
+    <h2>کتاب‌های برگزیده</h2>
+    <a class="link-more" href="{{ url_for('shop.catalog') }}">همه‌ی کتاب‌ها {{ icon("chev") }}</a>
+  </div>
+  <div class="grid grid-4">{% for b in featured %}{{ book_card(b) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% for b in mid_banners %}
+<section class="wrap">{{ banner_block(b) }}</section>
+{% endfor %}
+
+{% if feed_poems %}
+<section class="section wrap">
+  <div class="section-head">
+    {{ ornament() }}
+    <h2>تکه‌هایی از شعر</h2>
+    <p>چند سطر، برای امروز.</p>
+  </div>
+  <div class="grid grid-3">{% for p in feed_poems %}{{ poem_card(p) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if newest %}
+<section class="section wrap">
+  <div class="row-head">
+    <h2>تازه‌ها</h2>
+  </div>
+  <div class="grid grid-4">{% for b in newest %}{{ book_card(b) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="section wrap-sm" style="text-align:center">
+  {{ ornament() }}
+  <h2 style="margin-top:.8rem">{{ S.about_title }}</h2>
+  <p class="prose" style="margin-top:1rem">{{ S.about_text }}</p>
+  <a class="btn btn-ghost" style="margin-top:1rem" href="{{ url_for('shop.about') }}">بیشتر بدانید {{ icon("chev") }}</a>
+</section>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ p.title or "شعر تازه" }}{% endblock %}
+{% block content %}
+<div class="topbar"><h1>{{ "شعر تازه" if creating else p.title or "ویرایش شعر" }}</h1><a class="btn btn-ghost" href="{{ url_for('admin.poems') }}">بازگشت</a></div>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label>عنوان (اختیاری)</label><input class="input" name="title" value="{{ p.title }}"></div>
+      <div class="field"><label>مجموعه / منبع (اختیاری)</label><input class="input" name="collection" value="{{ p.collection }}"></div>
+    </div>
+    <div class="field"><label>متن شعر</label><textarea class="input" name="body" style="min-height:220px" required>{{ p.body }}</textarea></div>
+    <div class="field"><label>کجا نمایش داده شود؟</label>
+      <div class="checks">
+        {% for key, label in placements.items() %}
+        <label><input type="checkbox" name="place_{{ key }}" value="1" {{ "checked" if key in p.placement_list }}> {{ label }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label>ترتیب</label><input class="input" type="number" name="sort" value="{{ p.sort }}"></div>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" name="is_active" value="1" {{ "checked" if p.is_active }}> فعال</label>
+      <label><input type="checkbox" name="is_featured" value="1" {{ "checked" if p.is_featured }}> برگزیده</label>
+    </div>
+  </div>
+  <button class="btn" type="submit">{{ icon("check") }} ذخیره</button>
+</form>
+{% endblock %}

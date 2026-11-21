@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block title %}کتاب‌ها{% endblock %}
+{% block content %}
+<div class="topbar"><h1>کتاب‌ها</h1><a class="btn" href="{{ url_for('admin.book_new') }}">+ کتاب تازه</a></div>
+<div class="card">
+  <form class="toolbar" method="get">
+    <input class="input" style="max-width:220px" name="q" value="{{ q }}" placeholder="جستجو...">
+    <select class="input" style="max-width:200px" name="cat">
+      <option value="">همه‌ی دسته‌ها</option>
+      {% for c in categories %}<option value="{{ c.id }}" {{ "selected" if cat == c.id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+    <select class="input" style="max-width:160px" name="state">
+      <option value="">همه</option>
+      <option value="hidden" {{ "selected" if state=="hidden" }}>پنهان</option>
+      <option value="out" {{ "selected" if state=="out" }}>ناموجود</option>
+      <option value="featured" {{ "selected" if state=="featured" }}>برگزیده</option>
+    </select>
+    <button class="btn btn-ghost" type="submit">فیلتر</button>
+  </form>
+  <table>
+    <tr><th>عنوان</th><th>دسته</th><th>نوع</th><th>قیمت</th><th>موجودی/فایل</th><th>وضعیت</th><th></th></tr>
+    {% for b in pager.items %}
+    <tr>
+      <td><a href="{{ url_for('admin.book_edit', bid=b.id) }}">{{ b.title }}</a>{% if b.is_featured %} ⭐{% endif %}</td>
+      <td>{{ b.category.name if b.category else "—" }}</td>
+      <td>{{ "PDF" if b.is_digital else "چاپی" }}</td>
+      <td>{{ b.price|money }}</td>
+      <td>{{ "دارد" if b.pdf_path else "—" if b.is_digital else b.stock|fa }}</td>
+      <td><span class="pill {{ 'success' if b.is_active else 'danger' }}">{{ "فعال" if b.is_active else "پنهان" }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('admin.book_action', bid=b.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-ghost btn-sm" name="action" value="toggle">{{ "پنهان‌کردن" if b.is_active else "فعال‌کردن" }}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

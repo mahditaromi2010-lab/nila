@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}سفارش‌ها{% endblock %}
+{% block content %}
+<div class="topbar"><h1>سفارش‌ها</h1>
+  <div class="actions-row">
+    <a class="btn btn-ghost" href="{{ url_for('admin.orders_export') }}">خروجی CSV</a>
+    <form method="post" action="{{ url_for('admin.orders_expire') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-ghost">لغو سفارش‌های پرداخت‌نشده‌ی قدیمی</button></form>
+  </div>
+</div>
+<div class="card">
+  <form class="toolbar" method="get">
+    <input class="input" style="max-width:220px" name="q" value="{{ q }}" placeholder="کد، نام یا موبایل">
+    <select class="input" style="max-width:200px" name="status">
+      <option value="">همه‌ی وضعیت‌ها</option>
+      {% for key, label in statuses.items() %}<option value="{{ key }}" {{ "selected" if status==key }}>{{ label }} ({{ counts.get(key,0)|fa }})</option>{% endfor %}
+    </select>
+    <button class="btn btn-ghost" type="submit">فیلتر</button>
+  </form>
+  <table>
+    <tr><th>کد</th><th>تاریخ</th><th>مشتری</th><th>وضعیت</th><th>مبلغ</th><th></th></tr>
+    {% for o in pager.items %}
+    <tr>
+      <td class="latin">{{ o.code }}</td><td>{{ o.created_at|jdate }}</td><td>{{ o.customer_name }}</td>
+      <td><span class="pill">{{ o.status_label }}</span></td><td>{{ o.total|money }}</td>
+      <td><a href="{{ url_for('admin.order_detail', code=o.code) }}">مشاهده</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ورود به پنل مدیریت</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=1"></head>
+<body class="login">
+  <div class="card">
+    <h1>پنل مدیریت نیلا</h1>
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label>نام کاربری</label><input class="input" name="username" autofocus required></div>
+      <div class="field"><label>رمز عبور</label><input class="input" type="password" name="password" required></div>
+      <div class="field"><label>کد دومرحله‌ای (اگر فعال است)</label><input class="input" name="code" maxlength="6"></div>
+      <button class="btn" style="width:100%;justify-content:center" type="submit">ورود</button>
+    </form>
+  </div>
+</body>
+</html>

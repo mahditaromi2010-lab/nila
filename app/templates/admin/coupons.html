@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}کدهای تخفیف{% endblock %}
+{% block content %}
+<div class="topbar"><h1>کدهای تخفیف</h1></div>
+<div class="card">
+  <table>
+    <tr><th>کد</th><th>درصد</th><th>مقدار ثابت</th><th>حداقل خرید</th><th>سقف استفاده</th><th>استفاده‌شده</th><th>وضعیت</th><th></th></tr>
+    {% for c in rows %}
+    <tr>
+      <td class="latin">{{ c.code }}</td><td>{{ c.percent|fa }}٪</td><td>{{ c.amount|money }}</td>
+      <td>{{ c.min_total|money }}</td><td>{{ c.max_uses|fa if c.max_uses else "∞" }}</td><td>{{ c.used|fa }}</td>
+      <td><span class="pill {{ 'success' if c.is_active else 'danger' }}">{{ "فعال" if c.is_active else "غیرفعال" }}</span></td>
+      <td><form method="post" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="id" value="{{ c.id }}">
+        <button class="btn btn-danger btn-sm" name="action" value="delete" onclick="return confirm('حذف شود؟')">حذف</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+  <h3 style="margin-top:1.4rem">کد تازه</h3>
+  <form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field"><label>کد</label><input class="input" name="code" required></div>
+    <div class="field"><label>درصد تخفیف</label><input class="input" type="number" name="percent" value="0"></div>
+    <div class="field"><label>مقدار تخفیف ثابت (تومان)</label><input class="input" type="number" name="amount" value="0"></div>
+    <div class="field"><label>حداقل مبلغ خرید</label><input class="input" type="number" name="min_total" value="0"></div>
+    <div class="field"><label>سقف دفعات استفاده (۰ = نامحدود)</label><input class="input" type="number" name="max_uses" value="0"></div>
+    <div class="field"><label>انقضا بعد از چند روز (اختیاری)</label><input class="input" type="number" name="days" value="0"></div>
+    <input type="hidden" name="is_active" value="1">
+    <button class="btn" type="submit">افزودن</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}پنل مدیریت{% endblock %} | {{ S.site_name_fa }}</title>
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=1">
+</head>
+<body>
+{% set ep = request.endpoint or "" %}
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">{{ icon("feather") }} پنل نیلا</div>
+    <nav>
+      <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if ep=='admin.dashboard' }}">{{ icon("sparkle") }} داشبورد</a>
+      <a href="{{ url_for('admin.books') }}" class="{{ 'active' if ep.startswith('admin.book') }}">{{ icon("book") }} کتاب‌ها</a>
+      <a href="{{ url_for('admin.categories') }}" class="{{ 'active' if ep=='admin.categories' }}">{{ icon("tag") if false else icon("sparkle") }} دسته‌ها</a>
+      <a href="{{ url_for('admin.poems') }}" class="{{ 'active' if ep.startswith('admin.poem') }}">{{ icon("feather") }} شعرها</a>
+      <a href="{{ url_for('admin.banners') }}" class="{{ 'active' if ep.startswith('admin.banner') }}">{{ icon("quote") }} بنرها</a>
+      <a href="{{ url_for('admin.pages') }}" class="{{ 'active' if ep.startswith('admin.page') }}">{{ icon("pen") }} صفحات</a>
+      <a href="{{ url_for('admin.orders_list') }}" class="{{ 'active' if ep.startswith('admin.order') }}">{{ icon("cart") }} سفارش‌ها
+        {% if nav_review %}<span class="badge">{{ nav_review|fa }}</span>{% endif %}</a>
+      <a href="{{ url_for('admin.coupons') }}" class="{{ 'active' if ep=='admin.coupons' }}">{{ icon("gift") if false else icon("sparkle") }} کدهای تخفیف</a>
+      <a href="{{ url_for('admin.messages') }}" class="{{ 'active' if ep=='admin.messages' }}">{{ icon("mail") }} پیام‌ها
+        {% if nav_msgs %}<span class="badge">{{ nav_msgs|fa }}</span>{% endif %}</a>
+      <a href="{{ url_for('admin.settings_page', group='general') }}" class="{{ 'active' if ep=='admin.settings_page' }}">{{ icon("check") }} تنظیمات</a>
+      <a href="{{ url_for('admin.account') }}" class="{{ 'active' if ep=='admin.account' }}">{{ icon("check-circle") }} حساب من</a>
+      <a href="{{ url_for('admin.audit_log') }}" class="{{ 'active' if ep=='admin.audit_log' }}">{{ icon("clock") }} گزارش فعالیت</a>
+      <a href="{{ url_for('shop.home') }}" target="_blank">{{ icon("chev-r") if false else icon("chev") }} مشاهده‌ی سایت</a>
+    </nav>
+    <form method="post" action="{{ url_for('admin.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="logout" type="submit">خروج از حساب</button>
+    </form>
+  </aside>
+  <main class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+    <div class="flashes">{% for cat, m in messages %}<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}</div>
+    {% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

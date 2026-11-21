@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ p.title or "صفحه‌ی تازه" }}{% endblock %}
+{% block content %}
+<div class="topbar"><h1>{{ "صفحه‌ی تازه" if creating else p.title }}</h1><a class="btn btn-ghost" href="{{ url_for('admin.pages') }}">بازگشت</a></div>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card">
+    <div class="field"><label>عنوان</label><input class="input" name="title" value="{{ p.title }}" required></div>
+    {% if creating %}<div class="field"><label>نامک (مثلاً about یا privacy)</label><input class="input" name="slug" value="{{ p.slug }}"></div>{% endif %}
+    <div class="field"><label>متن</label><textarea class="input" name="body" style="min-height:300px">{{ p.body }}</textarea></div>
+  </div>
+  <button class="btn" type="submit">{{ icon("check") }} ذخیره</button>
+</form>
+{% endblock %}

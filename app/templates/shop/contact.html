@@ -1,0 +1,15 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}تماس با ما | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap-sm">
+  <div class="section-head"><h1>تماس با ما</h1><p>سوالی داری یا می‌خواهی پیامی بفرستی؟</p></div>
+  <form method="post" class="card" style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.6rem;box-shadow:var(--shadow)"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div style="position:absolute;opacity:0;height:0;overflow:hidden"><label>وبسایت<input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <div class="field"><label for="name">نام</label><input class="input" id="name" name="name" required></div>
+    <div class="field"><label for="contact">ایمیل یا شماره تماس</label><input class="input" id="contact" name="contact" required></div>
+    <div class="field"><label for="body">پیام</label><textarea class="input" id="body" name="body" required></textarea></div>
+    <button class="btn btn-block" type="submit">{{ icon("mail") }} ارسال پیام</button>
+  </form>
+</section>
+{% endblock %}

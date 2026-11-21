@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% block title %}شعرها{% endblock %}
+{% block content %}
+<div class="topbar"><h1>شعرها و تکه‌های نوشته</h1><a class="btn" href="{{ url_for('admin.poem_new') }}">+ شعر تازه</a></div>
+<div class="card">
+  <table>
+    <tr><th>عنوان</th><th>مجموعه</th><th>محل نمایش</th><th>وضعیت</th><th></th></tr>
+    {% for p in rows %}
+    <tr>
+      <td><a href="{{ url_for('admin.poem_edit', pid=p.id) }}">{{ p.title or p.body[:40] }}</a>{% if p.is_featured %} ⭐{% endif %}</td>
+      <td>{{ p.collection }}</td>
+      <td>{% for pl in p.placement_list %}<span class="pill">{{ placements.get(pl, pl) }}</span> {% endfor %}</td>
+      <td><span class="pill {{ 'success' if p.is_active else 'danger' }}">{{ "فعال" if p.is_active else "پنهان" }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('admin.poem_action', pid=p.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-ghost btn-sm" name="action" value="toggle">{{ "پنهان" if p.is_active else "فعال" }}</button>
+          <button class="btn btn-danger btn-sm" name="action" value="delete" onclick="return confirm('حذف شود؟')">حذف</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

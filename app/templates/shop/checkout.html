@@ -1,0 +1,73 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}تکمیل خرید | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  <h1 style="margin-bottom:1.6rem">تکمیل خرید</h1>
+  <form method="post" class="checkout-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow)">
+        <h3 style="margin-bottom:1rem">اطلاعات گیرنده</h3>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="field"><label>نام و نام خانوادگی</label>
+            <input class="input {{ 'has-err' if errors.customer_name }}" name="customer_name" value="{{ form.customer_name }}" required>
+            {% if errors.customer_name %}<span class="err">{{ errors.customer_name }}</span>{% endif %}</div>
+          <div class="field"><label>شماره موبایل</label>
+            <input class="input {{ 'has-err' if errors.phone }}" name="phone" value="{{ form.phone }}" required>
+            {% if errors.phone %}<span class="err">{{ errors.phone }}</span>{% endif %}</div>
+        </div>
+        <div class="field"><label>ایمیل (اختیاری، برای پیگیری بهتر)</label><input class="input" name="email" value="{{ form.email }}"></div>
+
+        {% if not t.all_digital %}
+        <h3 style="margin:1.4rem 0 1rem">نشانی ارسال</h3>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="field"><label>استان</label>
+            <select class="input {{ 'has-err' if errors.province }}" name="province">
+              <option value="">انتخاب کن</option>
+              {% for p in provinces %}<option value="{{ p }}" {{ "selected" if p == form.province }}>{{ p }}</option>{% endfor %}
+            </select>
+            {% if errors.province %}<span class="err">{{ errors.province }}</span>{% endif %}</div>
+          <div class="field"><label>شهر</label>
+            <input class="input {{ 'has-err' if errors.city }}" name="city" value="{{ form.city }}">
+            {% if errors.city %}<span class="err">{{ errors.city }}</span>{% endif %}</div>
+        </div>
+        <div class="field"><label>نشانی کامل</label>
+          <textarea class="input {{ 'has-err' if errors.address }}" name="address">{{ form.address }}</textarea>
+          {% if errors.address %}<span class="err">{{ errors.address }}</span>{% endif %}</div>
+        <div class="field"><label>کد پستی</label>
+          <input class="input {{ 'has-err' if errors.postal_code }}" name="postal_code" value="{{ form.postal_code }}">
+          {% if errors.postal_code %}<span class="err">{{ errors.postal_code }}</span>{% endif %}</div>
+        {% else %}
+        <p class="tag-pill" style="margin-top:1rem">{{ icon("download") }} سبد شما فقط شامل نسخه‌ی دیجیتال است؛ نیازی به نشانی نیست.</p>
+        {% endif %}
+
+        <div class="field"><label>یادداشت (اختیاری)</label><textarea class="input" name="note">{{ form.note }}</textarea></div>
+
+        <h3 style="margin:1.4rem 0 1rem">روش پرداخت</h3>
+        {% if errors.method %}<p class="err">{{ errors.method }}</p>{% endif %}
+        <div style="display:flex;flex-direction:column;gap:.7rem">
+          {% for m in methods %}
+          <label class="method-card {{ 'selected' if form.method == m.code or (methods|length == 1) }}">
+            <input type="radio" name="method" value="{{ m.code }}" {{ "checked" if form.method == m.code or methods|length == 1 }}>
+            <div><strong>{{ m.title }}</strong><div class="muted" style="font-size:.88rem">{{ m.description }}</div></div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="summary-card">
+        <h3 style="margin-bottom:1rem">خلاصه‌ی سفارش</h3>
+        {% for l in lines %}
+        <div class="summary-row"><span>{{ l.book.title }} × {{ l.qty|fa }}</span><span>{{ l.total|money }}</span></div>
+        {% endfor %}
+        <div class="summary-row"><span>جمع</span><span>{{ t.subtotal|money }} تومان</span></div>
+        {% if t.discount %}<div class="summary-row"><span>تخفیف</span><span>−{{ t.discount|money }}</span></div>{% endif %}
+        <div class="summary-row"><span>ارسال</span><span>{{ "رایگان" if t.shipping == 0 else (t.shipping|money ~ " تومان") }}</span></div>
+        <div class="summary-row total"><span>مجموع</span><span>{{ t.total|money }} تومان</span></div>
+        <button class="btn btn-block" type="submit" style="margin-top:1rem">{{ icon("check") }} ثبت نهایی سفارش</button>
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}

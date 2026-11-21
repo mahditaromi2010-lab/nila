@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}سفارش {{ order.code }}{% endblock %}
+{% block content %}
+<div class="topbar"><h1>سفارش {{ order.code }}</h1><a class="btn btn-ghost" href="{{ url_for('admin.orders_list') }}">بازگشت</a></div>
+
+<div class="card">
+  <h3>مشتری</h3>
+  <p>{{ order.customer_name }} — <span class="latin">{{ order.phone }}</span> {% if order.email %}— {{ order.email }}{% endif %}</p>
+  {% if not order.has_digital %}<p>{{ order.province }}، {{ order.city }}، {{ order.address }} — {{ order.postal_code }}</p>{% endif %}
+</div>
+
+<div class="card">
+  <h3>اقلام</h3>
+  <table>
+    <tr><th>عنوان</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>
+    {% for i in order.items %}<tr><td>{{ i.title }}</td><td>{{ i.qty|fa }}</td><td>{{ i.price|money }}</td><td>{{ i.line_total|money }}</td></tr>{% endfor %}
+  </table>
+  <p style="margin-top:.6rem">جمع: {{ order.subtotal|money }} — تخفیف: {{ order.discount|money }} — ارسال: {{ order.shipping|money }}
+    — <strong>مجموع: {{ order.total|money }} تومان</strong></p>
+</div>
+
+<div class="card">
+  <h3>وضعیت سفارش</h3>
+  <form method="post" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="status">
+    <div class="field" style="min-width:200px"><label>وضعیت</label>
+      <select class="input" name="status">
+        {% for key, label in statuses.items() %}<option value="{{ key }}" {{ "selected" if order.status==key }}>{{ label }}</option>{% endfor %}
+      </select></div>
+    {% if not order.has_digital %}
+    <div class="field" style="min-width:200px"><label>کد پیگیری پستی</label><input class="input" name="post_tracking" value="{{ order.post_tracking }}"></div>
+    {% endif %}
+    <button class="btn">ذخیره</button>
+  </form>
+</div>
+
+{% for p in order.payments %}
+<div class="card">
+  <h3>پرداخت #{{ p.id }} — <span class="pill">{{ p.status_label }}</span></h3>
+  <p>روش: {{ p.method }} — مبلغ: {{ p.amount|money }}</p>
+  {% if p.method == "card_to_card" and p.status in ("submitted", "approved", "rejected") %}
+  <p>۴ رقم آخر کارت: {{ p.payer_card_last4 }} — شماره پیگیری: {{ p.ref_number }} — زمان اعلامی: {{ p.paid_at_text }}</p>
+  {% if p.receipt_path %}<a href="{{ url_for('admin.receipt', name=p.receipt_path.split('/',1)[1]) }}" target="_blank">مشاهده‌ی رسید</a>{% endif %}
+  {% endif %}
+  {% if p.status == "submitted" %}
+  <form method="post" style="display:flex;gap:.6rem;margin-top:.6rem;flex-wrap:wrap"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="payment_id" value="{{ p.id }}">
+    <button class="btn" name="action" value="approve">{{ icon("check") }} تایید پرداخت</button>
+    <input class="input" style="max-width:260px" name="reason" placeholder="دلیل رد (اختیاری)">
+    <button class="btn btn-danger" name="action" value="reject">رد پرداخت</button>
+  </form>
+  {% endif %}
+  {% if p.reject_reason %}<p class="help">دلیل رد قبلی: {{ p.reject_reason }}</p>{% endif %}
+</div>
+{% endfor %}
+
+<div class="card">
+  <h3>یادداشت داخلی</h3>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="note">
+    <textarea class="input" name="admin_note">{{ order.admin_note }}</textarea>
+    <button class="btn" style="margin-top:.6rem">ذخیره یادداشت</button>
+  </form>
+</div>
+{% endblock %}

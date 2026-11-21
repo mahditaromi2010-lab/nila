@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% block title %}گزارش فعالیت{% endblock %}
+{% block content %}
+<div class="topbar"><h1>گزارش فعالیت</h1></div>
+<div class="card">
+  <table>
+    <tr><th>زمان</th><th>مدیر</th><th>عمل</th><th>هدف</th><th>جزئیات</th><th>IP</th></tr>
+    {% for r in rows %}
+    <tr><td>{{ r.created_at|jdate }}</td><td>{{ r.admin }}</td><td class="latin">{{ r.action }}</td><td>{{ r.target }}</td><td>{{ r.detail }}</td><td class="latin">{{ r.ip }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

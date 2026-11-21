@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block title %}صفحات{% endblock %}
+{% block content %}
+<div class="topbar"><h1>صفحات ثابت (درباره، حریم خصوصی، قوانین...)</h1><a class="btn" href="{{ url_for('admin.page_new') }}">+ صفحه‌ی تازه</a></div>
+<div class="card">
+  <table>
+    <tr><th>عنوان</th><th>نامک</th><th>آخرین ویرایش</th><th></th></tr>
+    {% for p in rows %}
+    <tr>
+      <td><a href="{{ url_for('admin.page_edit', pid=p.id) }}">{{ p.title }}</a></td>
+      <td class="latin">{{ p.slug }}</td>
+      <td>{{ p.updated_at|jdate }}</td>
+      <td><form method="post" action="{{ url_for('admin.page_delete', pid=p.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger btn-sm" onclick="return confirm('حذف شود؟')">حذف</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p class="help">صفحه‌ی با نامک «about» همان «درباره‌ی نیلا» است.</p>
+</div>
+{% endblock %}

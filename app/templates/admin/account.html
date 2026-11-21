@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% block title %}حساب من{% endblock %}
+{% block content %}
+<div class="topbar"><h1>حساب من ({{ me.username }})</h1></div>
+
+<div class="card">
+  <h3>تغییر رمز</h3>
+  <form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="password">
+    <div class="field"><label>رمز فعلی</label><input class="input" type="password" name="current" required></div>
+    <div class="field"><label>رمز تازه (حداقل ۱۰ کاراکتر)</label><input class="input" type="password" name="new" required></div>
+    <div class="field"><label>تکرار رمز تازه</label><input class="input" type="password" name="repeat" required></div>
+    <button class="btn">تغییر رمز</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>ورود دومرحله‌ای (۲FA)</h3>
+  {% if me.totp_secret %}
+  <p class="pill success">فعال است</p>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="totp_disable">
+    <div class="field"><label>رمز فعلی برای خاموش‌کردن</label><input class="input" type="password" name="current" required></div>
+    <button class="btn btn-danger">غیرفعال‌کردن ۲FA</button></form>
+  {% else %}
+  {% if pending_secret %}
+  <p>این کد را در اپ Google Authenticator یا مشابه وارد کن: <code class="latin">{{ pending_secret }}</code></p>
+  <p class="help latin">{{ uri }}</p>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="totp_confirm"><input type="hidden" name="secret" value="{{ pending_secret }}">
+    <div class="field"><label>کد ۶ رقمی</label><input class="input" name="code" maxlength="6" required></div>
+    <button class="btn">تایید و فعال‌سازی</button></form>
+  {% else %}
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="totp_start"><button class="btn">شروع فعال‌سازی ۲FA</button></form>
+  {% endif %}
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>مدیران سایت</h3>
+  <table>
+    <tr><th>نام کاربری</th><th>وضعیت</th><th>آخرین ورود</th><th></th></tr>
+    {% for a in admins %}
+    <tr><td>{{ a.username }}</td><td><span class="pill {{ 'success' if a.is_active else 'danger' }}">{{ "فعال" if a.is_active else "غیرفعال" }}</span></td>
+      <td>{{ a.last_login|jdate if a.last_login else "—" }}</td>
+      <td>{% if a.id != me.id %}<form method="post" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="toggle_admin"><input type="hidden" name="id" value="{{ a.id }}">
+        <button class="btn btn-ghost btn-sm">{{ "غیرفعال‌کردن" if a.is_active else "فعال‌کردن" }}</button></form>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  <h4 style="margin-top:1rem">افزودن مدیر تازه</h4>
+  <form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="add_admin">
+    <div class="field"><label>نام کاربری</label><input class="input" name="username" required></div>
+    <div class="field"><label>رمز</label><input class="input" type="password" name="password" required></div>
+    <button class="btn">افزودن</button>
+  </form>
+</div>
+{% endblock %}

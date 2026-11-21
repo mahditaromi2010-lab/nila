@@ -1,0 +1,19 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon, ornament %}
+{% from "_components.html" import poem_card, banner_block %}
+{% block title %}شعرها | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  {% for b in top_banners %}{{ banner_block(b) }}{% endfor %}
+  <div class="section-head">
+    {{ ornament() }}
+    <h1>شعرها</h1>
+    <p>مجموعه‌ای از شعرها و تکه‌های نوشته‌شده‌ی نیلا بستان‌پیرا.</p>
+  </div>
+  {% if rows %}
+  <div class="grid grid-3">{% for p in rows %}{{ poem_card(p) }}{% endfor %}</div>
+  {% else %}
+  <div class="empty-state">{{ icon("feather") }}<p>به‌زودی شعرهای تازه اینجا می‌آیند.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

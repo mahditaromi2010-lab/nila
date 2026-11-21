@@ -1,0 +1,23 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}پیگیری سفارش | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap-sm">
+  <div class="section-head"><h1>پیگیری سفارش</h1><p>کد سفارش و شماره موبایلت را وارد کن.</p></div>
+  <form method="post" class="card" style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow)"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field"><label>کد سفارش</label><input class="input" name="code" required></div>
+    <div class="field"><label>شماره موبایل</label><input class="input" name="phone" required></div>
+    <button class="btn btn-block" type="submit">{{ icon("search") }} پیگیری</button>
+  </form>
+  {% if recent %}
+  <h3 style="margin-top:2rem">سفارش‌های اخیر تو</h3>
+  <ul style="list-style:none;padding:0">
+    {% for o in recent %}
+    <li style="padding:.6rem 0;border-bottom:1px solid var(--line)">
+      <a href="{{ url_for('shop.order_view', code=o.code) }}">سفارش {{ o.code|fa }}</a> — {{ o.status_label }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endblock %}

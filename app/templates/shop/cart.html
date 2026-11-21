@@ -1,0 +1,52 @@
+{% extends "shop/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}سبد خرید | {{ S.site_name_fa }}{% endblock %}
+{% block content %}
+<section class="section wrap">
+  <h1 style="margin-bottom:1.6rem">سبد خرید</h1>
+  {% if not lines %}
+  <div class="empty-state">{{ icon("cart") }}<p>سبد خریدت خالیه.</p>
+    <a class="btn" href="{{ url_for('shop.catalog') }}" style="margin-top:1rem">رفتن به کتاب‌ها</a></div>
+  {% else %}
+  <div class="checkout-grid">
+    <div>
+      <form method="post" action="{{ url_for('shop.cart_update') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <table class="cart-table">
+          {% for l in lines %}
+          <tr>
+            <td>
+              <div class="cart-line">
+                <img class="cart-thumb" src="{{ media_url(l.book.cover.path_sm if l.book.cover else none) }}" alt="">
+                <div><a href="{{ url_for('shop.book', slug=l.book.slug) }}" style="font-weight:600">{{ l.book.title }}</a>
+                  <div class="muted" style="font-size:.85rem">{{ l.book.price|money }} تومان</div></div>
+              </div>
+            </td>
+            <td>
+              {% if l.book.is_digital %}<span class="tag-pill">PDF</span>
+              {% else %}<input class="input qty-input" type="number" name="qty_{{ l.book.id }}" value="{{ l.qty }}" min="1" max="{{ l.book.max_qty() }}">{% endif %}
+            </td>
+            <td class="nowrap">{{ l.total|money }} تومان</td>
+            <td><button class="icon-btn" type="submit" name="remove" value="{{ l.book.id }}" aria-label="حذف">{{ icon("trash") }}</button></td>
+          </tr>
+          {% endfor %}
+        </table>
+        <button class="btn btn-ghost" type="submit" style="margin-top:1rem">به‌روزرسانی سبد</button>
+      </form>
+    </div>
+    <div>
+      <div class="summary-card">
+        <form method="post" action="{{ url_for('shop.cart_coupon') }}" style="display:flex;gap:.5rem;margin-bottom:1rem"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input class="input" name="code" placeholder="کد تخفیف">
+          <button class="btn btn-sm" type="submit">اعمال</button>
+        </form>
+        <div class="summary-row"><span>جمع کتاب‌ها</span><span>{{ t.subtotal|money }} تومان</span></div>
+        {% if t.discount %}<div class="summary-row"><span>تخفیف</span><span>−{{ t.discount|money }} تومان</span></div>{% endif %}
+        <div class="summary-row"><span>ارسال</span><span>{{ "رایگان" if t.shipping == 0 else (t.shipping|money ~ " تومان") }}</span></div>
+        <div class="summary-row total"><span>مجموع</span><span>{{ t.total|money }} تومان</span></div>
+        <a class="btn btn-block" style="margin-top:1rem" href="{{ url_for('shop.checkout') }}">{{ icon("chev") }} ادامه‌ی خرید</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

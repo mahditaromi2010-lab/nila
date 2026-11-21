@@ -1,0 +1,50 @@
+{% from "_icons.html" import icon, ornament %}
+
+{% macro book_card(b) -%}
+<a class="book-card" href="{{ url_for('shop.book', slug=b.slug) }}">
+  <div class="book-cover">
+    {% if b.cover %}<img src="{{ media_url(b.cover.path_sm) }}" alt="{{ b.title }}" loading="lazy">
+    {% else %}{{ icon("book", "fallback") }}{% endif %}
+    {% if b.is_featured %}<span class="badge">برگزیده</span>{% endif %}
+    <span class="fmt">{{ "نسخه‌ی دیجیتال" if b.is_digital else "چاپی" }}</span>
+  </div>
+  <div class="book-body">
+    {% if b.category %}<span class="cat">{{ b.category.name }}</span>{% endif %}
+    <h3>{{ b.title }}</h3>
+    <p class="short">{{ b.short or b.excerpt|excerpt(90) }}</p>
+    <div class="price-row">
+      {% if b.price == 0 %}<span class="price-free">رایگان</span>
+      {% else %}
+        <span class="price">{{ b.price|money }} تومان</span>
+        {% if b.discount_percent %}<span class="price-old">{{ b.compare_price|money }}</span>{% endif %}
+      {% endif %}
+    </div>
+  </div>
+</a>
+{%- endmacro %}
+
+{% macro poem_card(p, link=True) -%}
+<div class="poem-card">
+  {{ icon("quote", "q-mark") }}
+  {% if p.title %}<h3>{% if link %}<a href="{{ url_for('shop.poem', slug=p.slug) }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}</h3>{% endif %}
+  <div class="poem-body">{{ p.body }}</div>
+  {% if p.collection %}<div class="poem-meta">{{ icon("book") }} از «{{ p.collection }}»</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro banner_block(b) -%}
+<div class="banner style-{{ b.style }}">
+  {% if b.image %}<img class="bg" src="{{ media_url(b.image) }}" alt="">{% endif %}
+  <div class="banner-inner">
+    {{ icon("quote", "q-mark") }}
+    {% if b.title %}<h3>{{ b.title }}</h3>{% endif %}
+    {% if b.quote_text %}<p class="banner-quote">{{ b.quote_text }}</p>{% endif %}
+    {% if b.subtitle %}<p class="sub">{{ b.subtitle }}</p>{% endif %}
+    {% if b.link_url %}<p style="margin-top:1rem"><a class="btn btn-gold btn-sm" href="{{ b.link_url }}">{{ b.link_label or "بیشتر بدان" }} {{ icon("chev-r") if false else icon("chev") }}</a></p>{% endif %}
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro strip_banner(b) -%}
+<div class="banner strip style-{{ b.style }}">{{ b.quote_text or b.title }}</div>
+{%- endmacro %}
